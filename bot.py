@@ -1,9 +1,15 @@
+import os
+import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import os
 import math
 
+logging.basicConfig(level=logging.INFO)
+
 TOKEN = os.getenv("TOKEN")
+
+if not TOKEN:
+    raise Exception("TOKEN missing in environment variables")
 
 user_locations = {}
 
@@ -19,7 +25,7 @@ def distance(lat1, lon1, lat2, lon2):
     return R * c
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Send your location 📍")
+    await update.message.reply_text("Send location 📍")
 
 async def location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
@@ -31,7 +37,7 @@ async def location(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def check(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(user_locations) < 2:
-        await update.message.reply_text("Need 2 people to send location")
+        await update.message.reply_text("Need 2 users")
         return
 
     users = list(user_locations.keys())
@@ -44,10 +50,14 @@ async def check(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(f"Distance: {d:.2f} meters")
 
-app = Application.builder().token(TOKEN).build()
+def main():
+    app = Application.builder().token(TOKEN).build()
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.LOCATION, location))
-app.add_handler(CommandHandler("check", check))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.LOCATION, location))
+    app.add_handler(CommandHandler("check", check))
 
-app.run_polling()
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
