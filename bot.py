@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 TOKEN = os.getenv("TOKEN")
 
 if not TOKEN:
-    raise Exception("TOKEN missing in environment variables")
+    raise Exception("TOKEN is missing in Render environment variables")
 
 user_locations = {}
 
@@ -25,7 +25,7 @@ def distance(lat1, lon1, lat2, lon2):
     return R * c
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Send location 📍")
+    await update.message.reply_text("Bot is working. Send location 📍")
 
 async def location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
@@ -37,7 +37,7 @@ async def location(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def check(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(user_locations) < 2:
-        await update.message.reply_text("Need 2 users")
+        await update.message.reply_text("Need 2 users with location")
         return
 
     users = list(user_locations.keys())
@@ -57,6 +57,7 @@ def main():
     app.add_handler(MessageHandler(filters.LOCATION, location))
     app.add_handler(CommandHandler("check", check))
 
+    print("Bot starting...")
     app.run_polling()
 
 if __name__ == "__main__":
