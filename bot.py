@@ -6,8 +6,8 @@ import math
 
 logging.basicConfig(level=logging.INFO)
 
-TOKEN = os.getenv("TOKEN")
-print("TOKEN:", TOKEN)
+TOKEN = os.environ.get("TOKEN", "").strip()
+print("TOKEN LOADED:", TOKEN != "")
 if not TOKEN:
     raise Exception("TOKEN is missing in Render environment variables")
 
